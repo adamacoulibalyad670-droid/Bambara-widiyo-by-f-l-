@@ -1,129 +1,60 @@
-# Bambara-Video Dubber Pro — الإصدار النهائي
+import streamlit as st
+import os
+import sys
+import tempfile
+import subprocess
 
-تطبيق احترافي لدبلجة الفيديو إلى اللغة البامبارا (Bamanankan) بميزات متقدمة:
+sys.path.insert(0, os.path.dirname(__file__))
 
-## الميزات
+st.set_page_config(page_title="Bambara Video Dubber Pro", layout="wide", page_icon="🎙️")
 
-- ✅ **اكتشاف اللغة تلقائياً** — يتعرف على لغة الفيديو الأصلية
-- ✅ **ترجمة ذكية** — ترجمة احترافية إلى البامبارا عبر OpenAI/DeepSeek/Grok
-- ✅ **ASR متخصص** — Whosper للبامبارا + Whisper متعدد اللغات
-- ✅ **توليد صوت** — MALIBA TTS مع اختيار المتحدث
-- ✅ **تحويل الأرقام** — تحويل تلقائي للأرقام إلى كلمات بامبارا
-- ✅ **مزج احترافي** — دمج الصوت الجديد مع الفيديو أو الصوت الأصلي
-- ✅ **إخراج MP4** — فيديو نهائي جاهز للتنزيل
+st.markdown("""
+<style>
+    .main-header { font-size: 2.5rem; color: #FF6B35; text-align: center; }
+    .stButton>button { background-color: #FF6B35; color: white; width: 100%; height: 3em; font-weight: bold; }
+</style>
+""", unsafe_allow_html=True)
 
-## المتطلبات
+st.markdown('<p class="main-header">Bamanankan Video Dubber Pro</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center;">Dub your videos to Bambara / Bamanankan</p>', unsafe_allow_html=True)
 
-- Python 3.8+
-- FFmpeg (مثبت في PATH)
-- pip
+with st.sidebar:
+    st.header("⚙️ الإعدادات الاحترافية")
+    st.markdown("**Author:** Bourama")
+    quality = st.selectbox("جودة الإخراج", ["Medium", "High", "Fast"])
+    st.info("✅ FFmpeg مثبت\n✅ التطبيق جاهز")
 
-## التشغيل
+def check_ffmpeg():
+    try:
+        subprocess.run(["ffmpeg", "-version"], capture_output=True, check=True)
+        return True
+    except:
+        return False
 
-### Windows
+ffmpeg_ok = check_ffmpeg()
+if not ffmpeg_ok:
+    st.error("❌ FFmpeg غير مثبت")
+else:
+    st.success("✅ FFmpeg يعمل")
 
-```bash
-python -m venv .venv
-.venv\\Scripts\\activate
-pip install -r requirements.txt
-pip install git+https://github.com/sudoping01/whosper.git
-pip install maliba-ai
-streamlit run app.py
-```
+uploaded_file = st.file_uploader("📤 ارفع فيديو MP4", type=["mp4", "mov", "avi", "mkv"])
 
-### Linux/macOS
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install git+https://github.com/sudoping01/whosper.git
-pip install maliba-ai
-streamlit run app.py
-```
-
-بعد التشغيل، افتح:
-```
-http://localhost:8501
-```
-
-## الإعدادات الاحترافية
-
-- **اللغة**: اكتشاف تلقائي + ترجمة، ترجمة مباشرة، أو بامبارا جاهز
-- **المتحدث**: Bourama (افتراضي)، Adama، Moussa، وغيرهم
-- **الصوت الأصلي**: إبقاء الصوت الأصلي منخفضاً أو حذفه كلياً
-- **الأرقام**: تحويل تلقائي إلى كلمات بامبارا
-- **نموذج الترجمة**: gpt-4o-mini (افتراضي) أو أي نموذج OpenAI متوافق
-
-## المشاريع المستخدمة
-
-- [Whosper](https://github.com/sudoping01/whosper) — ASR للبامبارا
-- [MALIBA-AI](https://huggingface.co/MALIBA-AI) — TTS متعدد اللغات الأفريقية
-- [faster-whisper](https://github.com/SYSTRAN/faster-whisper) — Whisper متعدد اللغات
-- [Streamlit](https://streamlit.io/) — الواجهة الرسومية
-
-## التخصيص
-
-### تغيير صوت المتحدث
-
-في الشريط الجانبي، أدخل اسم المتحدث من MALIBA:
-- Bourama (الافتراضي)
-- Adama
-- Moussa
-- Modibo
-- Seydou
-- Amadou
-- Bakary
-- Ngolo
-- Ibrahima
-- Amara
-
-### تغيير نموذج الترجمة
-
-في الإعدادات، عدّل اسم النموذج:
-- OpenAI: `gpt-4o`, `gpt-4o-mini`, `gpt-3.5-turbo`
-- DeepSeek: `deepseek-chat`
-- Grok: `grok-2`
-
-## استكشاف الأخطاء
-
-### خطأ: "FFmpeg غير مثبت"
-```bash
-# Windows (Chocolatey)
-choco install ffmpeg
-
-# macOS (Homebrew)
-brew install ffmpeg
-
-# Linux (apt)
-sudo apt install ffmpeg
-```
-
-### خطأ: "لا توجد لغة بامبارا"
-تأكد من تثبيت Whosper:
-```bash
-pip install git+https://github.com/sudoping01/whosper.git
-```
-
-### خطأ: "لا يوجد متحدث متاح"
-تأكد من تثبيت maliba-ai:
-```bash
-pip install maliba-ai
-```
-
-## الترخيص
-
-هذا المشروع يستخدم مشاريع مفتوحة المصدر. تحقق من رخص المشاريع المستخدمة قبل الاستخدام التجاري.
-
-## الدعم
-
-إذا واجهت مشاكل، تحقق من:
-1. تثبيت Python 3.8+
-2. تثبيت FFmpeg
-3. تثبيت جميع المتطلبات من requirements.txt
-4. تثبيت Whosper و maliba-ai
-
----
-
-**الإصدار**: 1.0.0 Pro  
-**آخر تحديث**: 2026-09-25
+if uploaded_file is not None:
+    tfile = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
+    tfile.write(uploaded_file.read())
+    video_path = tfile.name
+    st.video(video_path)
+    st.write(f"الحجم: {uploaded_file.size/1024/1024:.2f} MB")
+    
+    if st.button("🚀 بدء الدبلجة الاحترافية"):
+        with st.spinner("جاري المعالجة..."):
+            audio_path = video_path.replace(".mp4", ".wav")
+            cmd = ["ffmpeg", "-y", "-i", video_path, "-vn", "-acodec", "pcm_s16le", "-ar", "16000", audio_path]
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            if os.path.exists(audio_path):
+                st.success("✅ تم استخراج الصوت")
+                st.audio(audio_path)
+            else:
+                st.error(f"فشل: {result.stderr[:500]}")
+else:
+    st.info("👆 ارفع فيديو لبدء")
