@@ -1,14 +1,8 @@
-streamlit>=1.36
-numpy>=1.26
-soundfile>=0.12
-librosa>=0.10
-moviepy>=1.0.3
-torch>=2.2
-transformers>=4.42
-faster-whisper>=1.0.3
-openai>=1.35
-python-dotenv>=1.0
-streamlit-option-menu>=0.3.0
-# متطلبات إضافية للبامبارا:
-# pip install git+https://github.com/sudoping01/whosper.git
-# pip install maliba-ai
+streamlit
+openai-whisper
+transformers
+torch
+torchaudio
+sentencepiece
+accelerate
+ffmpeg-python
