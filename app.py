@@ -4,7 +4,6 @@ import sys
 import tempfile
 import subprocess
 
-# --- إصلاح المسار ---
 sys.path.insert(0, os.path.dirname(__file__))
 
 st.set_page_config(page_title="Bambara Video Dubber Pro", layout="wide", page_icon="🎙️")
@@ -34,38 +33,28 @@ def check_ffmpeg():
 
 ffmpeg_ok = check_ffmpeg()
 if not ffmpeg_ok:
-    st.error("❌ FFmpeg غير مثبت. تأكد من وجود ملف packages.txt وفيه كلمة ffmpeg")
+    st.error("❌ FFmpeg غير مثبت")
 else:
-    st.success("✅ FFmpeg يعمل بشكل صحيح")
+    st.success("✅ FFmpeg يعمل")
 
-uploaded_file = st.file_uploader("📤 ارفع فيديو MP4 (حتى 200MB)", type=["mp4", "mov", "avi", "mkv"])
+uploaded_file = st.file_uploader("📤 ارفع فيديو MP4", type=["mp4", "mov", "avi", "mkv"])
 
 if uploaded_file is not None:
-    col1, col2 = st.columns(2)
     tfile = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
     tfile.write(uploaded_file.read())
     video_path = tfile.name
+    st.video(video_path)
+    st.write(f"الحجم: {uploaded_file.size/1024/1024:.2f} MB")
     
-    with col1:
-        st.markdown("### 📹 الفيديو الأصلي")
-        st.video(video_path)
-        st.write(f"**الحجم:** {uploaded_file.size / 1024 / 1024:.2f} MB")
-
-    with col2:
-        st.markdown("### 🎙️ نتيجة الدبلجة")
-        if st.button("🚀 بدء الدبلجة الاحترافية إلى بامبارا"):
-            with st.spinner("جاري المعالجة..."):
-                try:
-                    audio_path = video_path.replace(".mp4", ".wav")
-                    cmd = ["ffmpeg", "-y", "-i", video_path, "-vn", "-acodec", "pcm_s16le", "-ar", "16000", audio_path]
-                    result = subprocess.run(cmd, capture_output=True, text=True)
-                    if os.path.exists(audio_path):
-                        st.success("✅ تم استخراج الصوت بنجاح")
-                        st.audio(audio_path)
-                        st.info("🔧 FFmpeg يعمل! الآن يمكنك ربط Whisper + ترجمة بامبارا")
-                    else:
-                        st.error(f"فشل: {result.stderr[:500]}")
-                except Exception as e:
-                    st.error(f"خطأ: {e}")
+    if st.button("🚀 بدء الدبلجة الاحترافية"):
+        with st.spinner("جاري المعالجة..."):
+            audio_path = video_path.replace(".mp4", ".wav")
+            cmd = ["ffmpeg", "-y", "-i", video_path, "-vn", "-acodec", "pcm_s16le", "-ar", "16000", audio_path]
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            if os.path.exists(audio_path):
+                st.success("✅ تم استخراج الصوت")
+                st.audio(audio_path)
+            else:
+                st.error(f"فشل: {result.stderr[:500]}")
 else:
-    st.info("👆 ارفع فيديو لبدء المعالجة")
+    st.info("👆 ارفع فيديو لبدء")
