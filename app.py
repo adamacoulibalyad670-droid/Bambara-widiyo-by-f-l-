@@ -1,5 +1,5 @@
 import streamlit as st
-import tempfile, subprocess, os
+import tempfile, subprocess
 
 st.set_page_config(page_title="Bambara Dubber", page_icon="🎙️", layout="centered")
 st.title("🎙️ Bamanankan Dubber Pro")
@@ -27,7 +27,7 @@ if uploaded:
             text = result["text"]
             st.text_area("النص الأصلي", text, height=100)
 
-                with st.spinner("3/3 ترجمة للبامبارا..."):
+        with st.spinner("3/3 ترجمة للبامبارا..."):
             from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
             tok = AutoTokenizer.from_pretrained("facebook/nllb-200-distilled-600M")
             trans_model = AutoModelForSeq2SeqLM.from_pretrained("facebook/nllb-200-distilled-600M")
@@ -35,6 +35,7 @@ if uploaded:
             translated_tokens = trans_model.generate(**inputs, forced_bos_token_id=tok.lang_code_to_id["bam_Latn"], max_length=400)
             bambara = tok.batch_decode(translated_tokens, skip_special_tokens=True)[0]
             st.success("✅ اكتملت الترجمة للبامبارا!")
-            st.text_area("Bamanankan - النص بالبامبارا", bambara, height=180)
+            st.text_area("Bamanankan", bambara, height=180)
             st.balloons()
-            st.snow()
+else:
+    st.info("👆 ارفع فيديو للبدء")
