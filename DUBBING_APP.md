@@ -10,7 +10,7 @@ import soundfile as sf
 import streamlit as st
 
 st.set_page_config(
-    page_title="Bamanankan Video Dubber Pro",
+    page_title="Bambara-Video Dubber Pro",
     page_icon="🎬",
     layout="wide",
     initial_sidebar_state="expanded",
