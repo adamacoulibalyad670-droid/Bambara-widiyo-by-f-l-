@@ -27,12 +27,14 @@ if uploaded:
             text = result["text"]
             st.text_area("النص الأصلي", text, height=100)
 
-        with st.spinner("3/3 ترجمة للبامبارا..."):
-            from transformers import pipeline
-            translator = pipeline("translation", model="facebook/nllb-200-distilled-600M", src_lang="fra_Latn", tgt_lang="bam_Latn", max_length=400)
-            bambara = translator(text)[0]['translation_text']
-            st.success("✅ اكتملت!")
-            st.text_area("Bamanankan", bambara, height=150)
+                with st.spinner("3/3 ترجمة للبامبارا..."):
+            from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+            tok = AutoTokenizer.from_pretrained("facebook/nllb-200-distilled-600M")
+            trans_model = AutoModelForSeq2SeqLM.from_pretrained("facebook/nllb-200-distilled-600M")
+            inputs = tok(text, return_tensors="pt", truncation=True, max_length=400)
+            translated_tokens = trans_model.generate(**inputs, forced_bos_token_id=tok.lang_code_to_id["bam_Latn"], max_length=400)
+            bambara = tok.batch_decode(translated_tokens, skip_special_tokens=True)[0]
+            st.success("✅ اكتملت الترجمة للبامبارا!")
+            st.text_area("Bamanankan - النص بالبامبارا", bambara, height=180)
             st.balloons()
-else:
-    st.info("👆 ارفع فيديو للبدء")
+            st.snow()
