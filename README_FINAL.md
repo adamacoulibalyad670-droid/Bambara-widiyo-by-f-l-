@@ -1,4 +1,4 @@
-# Bamanankan Video Dubber Pro — الإصدار النهائي
+# Bambara-Video Dubber Pro — الإصدار النهائي
 
 تطبيق احترافي لدبلجة الفيديو إلى اللغة البامبارا (Bamanankan) بميزات متقدمة:
 
