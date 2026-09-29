@@ -29,11 +29,10 @@ if uploaded:
 
         with st.spinner("3/3 ترجمة للبامبارا..."):
             from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-            tok = AutoTokenizer.from_pretrained("facebook/nllb-200-distilled-600M")
-            trans_model = AutoModelForSeq2SeqLM.from_pretrained("facebook/nllb-200-distilled-600M")
-            inputs = tok(text, return_tensors="pt", truncation=True, max_length=400)
-            translated_tokens = trans_model.generate(**inputs, forced_bos_token_id=tok.lang_code_to_id["bam_Latn"], max_length=400)
-            bambara = tok.batch_decode(translated_tokens, skip_special_tokens=True)[0]
+            tokenizer.src_lang = "fra_Latn"
+inputs = tokenizer(original_text, return_tensors="pt", truncation=True, max_length=400)
+translated_tokens = trans_model.generate(**inputs, forced_bos_token_id=tokenizer.convert_tokens_to_ids("bam_Latn"), max_length=400)
+bam_text = tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]
             st.success("✅ اكتملت الترجمة للبامبارا!")
             st.text_area("Bamanankan", bambara, height=180)
             st.balloons()
