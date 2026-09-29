@@ -1,5 +1,6 @@
 import streamlit as st
-import tempfile, subprocess
+import tempfile
+import subprocess
 
 st.set_page_config(page_title="Bambara Dubber", page_icon="🎙️")
 st.title("🎙️ Bamanankan Dubber")
@@ -10,6 +11,11 @@ def load_whisper():
     import whisper
     return whisper.load_model("tiny")
 
+@st.cache_resource
+def get_ffmpeg():
+    import imageio_ffmpeg
+    return imageio_ffmpeg.get_ffmpeg_exe()
+
 uploaded = st.file_uploader("ارفع فيديو", type=["mp4","mov","mkv","avi","mp3","wav"])
 
 if uploaded:
@@ -18,8 +24,9 @@ if uploaded:
     st.video(tfile.name)
 
     if st.button("🚀 ابدأ الدبلجة للبامبارا"):
+        ffmpeg_exe = get_ffmpeg()
         audio_path = tfile.name.replace(".mp4",".wav")
-        subprocess.run(["ffmpeg","-y","-i",tfile.name,"-vn","-ac","1","-ar","16000",audio_path], check=True)
+        subprocess.run([ffmpeg_exe,"-y","-i",tfile.name,"-vn","-ac","1","-ar","16000",audio_path], check=True)
         
         with st.spinner("جاري الاستماع..."):
             model = load_whisper()
@@ -32,7 +39,7 @@ if uploaded:
                 from deep_translator import GoogleTranslator
                 bam = GoogleTranslator(source='fr', target='bm').translate(text)
             except:
-                bam = text  # اذا فشل، اعرض الأصلي
+                bam = text
             
             st.success("تم! 🎉")
             st.text_area("Bamanankan (Bambara)", bam, height=180)
