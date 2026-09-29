@@ -1,8 +1,3 @@
 streamlit
 openai-whisper
-transformers
-torch
-torchaudio
-sentencepiece
-accelerate
-ffmpeg-python
+deep-translator
