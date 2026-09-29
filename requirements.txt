@@ -1,3 +1,4 @@
 streamlit
 openai-whisper
 deep-translator
+imageio-ffmpeg
