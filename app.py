@@ -2,11 +2,10 @@ import streamlit as st
 import whisper
 import tempfile
 import os
-from deep_translator import MyMemoryTranslator, GoogleTranslator
-import time
+from deep_translator import MyMemoryTranslator
 
-st.set_page_config(page_title="Bamanankan Dubber V3 Light", layout="centered")
-st.title("Bamanankan Dubber - V3 Light")
+st.set_page_config(page_title="Bamanankan Dubber", layout="centered")
+st.title("Bamanankan Dubber V3 - Fixed")
 
 uploaded = st.file_uploader("Video kelen upload", type=["mp4","mov","mp3","wav"])
 
@@ -23,30 +22,16 @@ if uploaded:
             english_text = result["text"]
             st.info(f"Angilɛ: {english_text}")
 
-        # Traduction avec protection anti-blocage
-        with st.spinner("Traduction en Bambara..."):
-            text_short = english_text[:500]  # Limite pour éviter blocage
-            
-            bambara = ""
+        with st.spinner("Traduction..."):
             try:
-                # Essaie MyMemory d'abord (gratuit, pas de limite)
-                bambara = MyMemoryTranslator(source='en-US', target='bm').translate(text_short)
+                # 1 SEUL request, pas de boucle = pas de blocage Google
+                short = english_text[:480]
+                bambara = MyMemoryTranslator(source='en-US', target='bm').translate(short)
                 st.success(f"Bamanankan na: {bambara}")
             except Exception as e:
-                st.warning(f"MyMemory echoué, essaie Google par morceaux... {e}")
-                try:
-                    words = text_short.split()
-                    parts = []
-                    for i in range(0, len(words), 15):
-                        chunk = " ".join(words[i:i+15])
-                        if chunk.strip():
-                            p = GoogleTranslator(source='en', target='bm').translate(chunk)
-                            parts.append(p)
-                            time.sleep(1.2)  # Pause pour Google
-                    bambara = " ".join(parts)
-                    st.success(f"Bamanankan na: {bambara}")
-                except Exception as e2:
-                    st.error(f"Traduction error: {e2}")
-                    st.write(f"Mais transcription bɛ yen! Angilɛ: {text_short}")
+                st.error(f"Error: {e}")
+                # Fallback: affiche au moins transcription
+                st.write(f"Transcription réussie: {english_text}")
+                st.write("Traduction Bamanankan: Réessaie dans 1 minute, Google bɛ repos.")
 
         os.unlink(tmp_path)
