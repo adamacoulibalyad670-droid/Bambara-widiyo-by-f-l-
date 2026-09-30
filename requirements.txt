@@ -1,4 +1,7 @@
 streamlit
 openai-whisper
-deep-translator
 imageio-ffmpeg
+transformers
+torch
+sentencepiece
+accelerate
