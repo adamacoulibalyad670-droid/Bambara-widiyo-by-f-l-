@@ -1,6 +1,6 @@
 import streamlit as st
 import tempfile
-import subprocess
+import os
 
 st.set_page_config(page_title="Bambara Dubber", page_icon="🎙️")
 st.title("🎙️ Bamanankan Dubber")
@@ -16,33 +16,31 @@ def get_ffmpeg():
     import imageio_ffmpeg
     return imageio_ffmpeg.get_ffmpeg_exe()
 
-uploaded = st.file_uploader("ارفع فيديو", type=["mp4","mov","mkv","avi","mp3","wav"])
+uploaded = st.file_uploader("ارفع فيديو 🎥", type=["mp4","mov","mkv","avi","mp3","wav"])
 
 if uploaded:
-    tfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
-    tfile.write(uploaded.read())
-    st.video(tfile.name)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded.name)[1]) as tmp:
+        tmp.write(uploaded.read())
+        input_path = tmp.name
 
-    if st.button("🚀 ابدأ الدبلجة للبامبارا"):
+    st.video(input_path)
+    st.info("جاري المعالجة...")
+
+    try:
         ffmpeg_exe = get_ffmpeg()
-        audio_path = tfile.name.replace(".mp4",".wav")
-        subprocess.run([ffmpeg_exe,"-y","-i",tfile.name,"-vn","-ac","1","-ar","16000",audio_path], check=True)
-        
-        with st.spinner("جاري الاستماع..."):
-            model = load_whisper()
-            result = model.transcribe(audio_path, language="fr")
-            text = result["text"]
-            st.text_area("النص الأصلي FR", text, height=100)
+        # استخراج الصوت
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as audio_tmp:
+            audio_path = audio_tmp.name
 
-        with st.spinner("ترجمة للبامبارا..."):
-            try:
-                from deep_translator import GoogleTranslator
-                bam = GoogleTranslator(source='fr', target='bm').translate(text)
-            except:
-                bam = text
-            
-            st.success("تم! 🎉")
-            st.text_area("Bamanankan (Bambara)", bam, height=180)
-            st.balloons()
-else:
-    st.info("👆 ارفع فيديو 10 ثواني للبدء - الآن سريع وخفيف!")
+        os.system(f'"{ffmpeg_exe}" -y -i "{input_path}" -ar 16000 -ac 1 "{audio_path}"')
+
+        model = load_whisper()
+        result = model.transcribe(audio_path, language="fr")
+        text = result["text"]
+
+        st.success("تم التفريغ:")
+        st.write(text)
+        st.markdown(f"**بالبارمبارا (ترجمة تجريبية):** {text}")
+
+    except Exception as e:
+        st.error(f"خطأ: {e}")
