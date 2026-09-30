@@ -1,26 +1,21 @@
 import streamlit as st
 import tempfile, os
 
-st.set_page_config(page_title="Bambara Dubber V3", page_icon="🎙️")
-st.title("🎙️ Bamanankan Dubber - V3")
-st.markdown("Angilɛ → Bamanankan 🔄")
+st.set_page_config(page_title="Bambara Dubber V3 Light")
+st.title("🎙️ Bamanankan Dubber - V3 Light")
+st.markdown("Angilɛ → Bamanankan")
 
 @st.cache_resource
-def load_models():
+def load_whisper():
     import whisper
-    from transformers import pipeline
-    whisper_model = whisper.load_model("small")
-    # NLLB ye Bambara dɔn!
-    translator = pipeline("translation", model="facebook/nllb-200-distilled-600M",
-                          src_lang="eng_Latn", tgt_lang="bam_Latn")
-    return whisper_model, translator
+    return whisper.load_model("small")
 
 @st.cache_resource
 def get_ffmpeg():
     import imageio_ffmpeg
     return imageio_ffmpeg.get_ffmpeg_exe()
 
-uploaded = st.file_uploader("Video (English)", type=["mp4","mp3","wav"])
+uploaded = st.file_uploader("Video (English)", type=["mp4","mp3","wav","m4a"])
 
 if uploaded:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp:
@@ -29,19 +24,22 @@ if uploaded:
     st.video(input_path)
 
     if st.button("Traduire en Bambara 🚀"):
-        with st.spinner("Transcription + Traduction..."):
+        with st.spinner("A bɛ baara la..."):
             ffmpeg_exe = get_ffmpeg()
             audio_path = input_path + ".wav"
             os.system(f'"{ffmpeg_exe}" -y -i "{input_path}" -ar 16000 -ac 1 "{audio_path}"')
 
-            whisper_model, translator = load_models()
-            result = whisper_model.transcribe(audio_path, language="en")
+            model = load_whisper()
+            result = model.transcribe(audio_path, language="en")
             english_text = result["text"]
+            
+            st.info(f"**Angilɛ:** {english_text}")
 
-            st.markdown("**Angilɛkan:**")
-            st.write(english_text)
-
-            bambara_text = translator(english_text, max_length=500)[0]['translation_text']
-
-            st.success("**Bamanankan na:**")
-            st.write(f"### {bambara_text}")
+            try:
+                from deep_translator import GoogleTranslator
+                bambara = GoogleTranslator(source='en', target='bm').translate(english_text)
+                st.success("**Bamanankan na:**")
+                st.markdown(f"### {bambara}")
+            except Exception as e:
+                st.warning(f"Traduction error: {e}")
+                st.write("Mais transcription bɛ yen!")
